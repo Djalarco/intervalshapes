@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genially Wrapper</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        @media only screen and (max-width: 767px) and (orientation: portrait) {
+            .rotated-iframe {
+                position: absolute;
+                width: 100vh;
+                height: 100vw;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <iframe 
+        id="geniallyFrame"
+        class="rotated-iframe"
+        src="https://view.genially.com/68005a932a864e6d9119ca75" 
+        frameborder="0"
+        allowfullscreen="true"
+        allowscriptaccess="always"
+        scrolling="yes"
+        allownetworking="all">
+    </iframe>
+    
+    <script>
+        // Simple function to check if we should apply rotation
+        function adjustForMobile() {
+            const iframe = document.getElementById('geniallyFrame');
+            const isMobile = window.innerWidth <= 767;
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isMobile && isPortrait) {
+                iframe.className = 'rotated-iframe';
+            } else {
+                iframe.className = '';
+            }
+        }
+        
+        // Run on load and when resizing/rotating
+        window.addEventListener('load', adjustForMobile);
+        window.addEventListener('resize', adjustForMobile);
+        window.addEventListener('orientationchange', adjustForMobile);
+    </script>
+</body>
+</html>
