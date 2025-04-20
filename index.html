@@ -2,66 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Genially Wrapper</title>
     <style>
-        body, html {
+        html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
+            position: fixed;
         }
         
-        iframe {
+        /* The iframe container */
+        .genially-container {
             position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        /* The iframe itself */
+        .genially-embed {
             width: 100%;
             height: 100%;
             border: none;
         }
         
-        @media only screen and (max-width: 767px) and (orientation: portrait) {
-            .rotated-iframe {
-                position: absolute;
+        /* Style for small mobile devices (phones) in portrait mode */
+        @media only screen and (max-width: 480px) and (orientation: portrait) {
+            .genially-container {
                 width: 100vh;
                 height: 100vw;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%) rotate(90deg);
+                transform-origin: center;
+            }
+        }
+        
+        /* Instruction overlay for phones */
+        .instruction {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            z-index: 100;
+            font-family: Arial, sans-serif;
+            display: none;
+        }
+        
+        @media only screen and (max-width: 480px) and (orientation: portrait) {
+            .instruction {
+                display: block;
             }
         }
     </style>
 </head>
 <body>
-    <iframe 
-        id="geniallyFrame"
-        class="rotated-iframe"
-        src="https://view.genially.com/68005a932a864e6d9119ca75" 
-        frameborder="0"
-        allowfullscreen="true"
-        allowscriptaccess="always"
-        scrolling="yes"
-        allownetworking="all">
-    </iframe>
+    <div class="genially-container">
+        <iframe 
+            class="genially-embed"
+            src="https://view.genially.com/68005a932a864e6d9119ca75" 
+            frameborder="0"
+            allowfullscreen="true"
+            allowscriptaccess="always"
+            scrolling="yes"
+            allownetworking="all">
+        </iframe>
+    </div>
+    
+    <div class="instruction" id="instruction">
+        Content optimized for landscape viewing
+    </div>
     
     <script>
-        // Simple function to check if we should apply rotation
-        function adjustForMobile() {
-            const iframe = document.getElementById('geniallyFrame');
-            const isMobile = window.innerWidth <= 767;
-            const isPortrait = window.innerHeight > window.innerWidth;
+        // Simple function to detect if device should have rotated content
+        function shouldRotate() {
+            // Any device with screen width <= 480px in portrait mode
+            return window.innerWidth <= 480 && window.innerHeight > window.innerWidth;
+        }
+        
+        // Function to adjust for device type
+        function adjustForDevice() {
+            const container = document.querySelector('.genially-container');
+            const instruction = document.getElementById('instruction');
             
-            if (isMobile && isPortrait) {
-                iframe.className = 'rotated-iframe';
+            if (shouldRotate()) {
+                // Small device in portrait mode - force landscape view
+                container.style.width = '100vh';
+                container.style.height = '100vw';
+                container.style.top = '50%';
+                container.style.left = '50%';
+                container.style.transform = 'translate(-50%, -50%) rotate(90deg)';
+                container.style.transformOrigin = 'center';
+                
+                // Show instruction
+                instruction.style.display = 'block';
+                
+                // Hide instruction after 3 seconds
+                setTimeout(() => {
+                    instruction.style.display = 'none';
+                }, 3000);
             } else {
-                iframe.className = '';
+                // Larger devices or landscape orientation - normal view
+                container.style.width = '100%';
+                container.style.height = '100%';
+                container.style.top = '0';
+                container.style.left = '0';
+                container.style.transform = 'none';
+                
+                // Hide instruction
+                instruction.style.display = 'none';
             }
         }
         
-        // Run on load and when resizing/rotating
-        window.addEventListener('load', adjustForMobile);
-        window.addEventListener('resize', adjustForMobile);
-        window.addEventListener('orientationchange', adjustForMobile);
+        // Run on page load and when orientation changes
+        window.addEventListener('load', adjustForDevice);
+        window.addEventListener('resize', adjustForDevice);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(adjustForDevice, 100);
+        });
     </script>
 </body>
 </html>
